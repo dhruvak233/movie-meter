@@ -1,4 +1,5 @@
-import { moviesDB, ratingsDB } from "../database/connectionManager";
+// import { moviesDB, ratingsDB } from "../../database/connectionManager";
+import { moviesDB, ratingsDB } from "../src/database/connectionManager";
 
 export async function setupTestDB() {
     try {

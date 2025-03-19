@@ -1,0 +1,30 @@
+on:
+  workflow_call:
+    inputs:
+      deployEnv:
+        required: true
+        type: string
+
+concurrency:
+  group: ${{ inputs.deployEnv }}
+
+jobs:
+  deployment:
+    name: test-${{ inputs.deployEnv }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.deployEnv }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT }}:role/GitHub-CICD-Role
+          aws-region: us-east-1
+
+      - name: Create API GW stack
+        id: apigw
+        uses: Test/cdk-gha-apigw@v1
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

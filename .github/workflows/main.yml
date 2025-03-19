@@ -1,0 +1,49 @@
+name: TEST.API Workflow
+
+on:
+  push:
+    branches: [develop, main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+  packages: read
+
+jobs:
+
+  test:
+    name: Test
+    uses: ./.github/workflows/test.yml
+
+  deploy-dev:
+    name: Deploy
+    if: github.ref_name == 'develop'
+    uses: ./.github/workflows/deploy.yml
+    needs: test
+    with:
+      deployEnv: dev
+
+  deploy-qa:
+    name: Deploy
+    if: github.ref_name == 'develop'
+    uses: ./.github/workflows/deploy.yml
+    needs: test
+    with:
+      deployEnv: qa
+
+  # deploy-stage:
+  #   name: Deploy
+  #   if: github.ref_name == 'main' || startsWith(github.ref_name, 'hotfix/')
+  #   uses: ./.github/workflows/deploy.yml
+  #   needs: test
+  #   with:
+  #     deployEnv: stage
+
+  # deploy-prod:
+  #   name: Deploy
+  #   if: github.ref_name == 'main' || startsWith(github.ref_name, 'hotfix/')
+  #   uses: ./.github/workflows/deploy.yml
+  #   needs: test
+  #   with:
+  #     deployEnv: prod

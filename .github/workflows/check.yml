@@ -1,0 +1,21 @@
+name: Check
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+    types: [opened, synchronize, reopened]
+
+permissions:
+  id-token: write
+  contents: read
+  packages: read
+
+jobs:
+  test:
+    name: Test
+    uses: ./.github/workflows/test.yml
+  lint:
+    name: Lint
+    uses: ./.github/workflows/lint.yml

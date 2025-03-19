@@ -8,10 +8,7 @@ MovieMeter is a **Node.js API** built with **TypeScript, Express, Sequelize, and
 ## **🛠️ Setup & Installation**
 
 ### **1️⃣ Clone the Repository**
-Unzip the folder
-```sh
-cd moviemeter
-```
+https://github.com/dhruvak233/movie-meter
 
 ### **2️⃣ Install Dependencies**
 Ensure you have **Node.js** installed, then run:
@@ -57,13 +54,6 @@ The project uses **Jest** for testing. Run the following command:
 ```sh
 npm test
 ```
-
-### **📊 Run Tests with Coverage**
-To check test coverage:
-```sh
-npm run test:coverage
-```
-
 ---
 
 ## **📖 API Endpoints**
@@ -85,7 +75,8 @@ npm run test:coverage
       "genres": ["Drama", "Thriller"],
       "releaseDate": "2020-05-14",
       "budget": "$5,000,000.00"
-    }
+    },
+    //...
   ]
 }
 ```
@@ -120,12 +111,10 @@ npm run test:coverage
 ---
 
 ### **3️⃣ Movies By Year**
-**🔹 Endpoint:** `GET /movies/year/:year?page=1`  
+**🔹 Endpoint:** `GET /movies?year=2000&page=1`  
 **🔹 Description:** Fetches **movies released in a specific year**, paginated.  
-**🔹 Path Params:**  
+**🔹 Query Params:** 
 - `year` – The release year (e.g., `2000`).
-
-**🔹 Query Params:**  
 - `page` – Specify which page of results to retrieve.
 
 #### **Example Response:**
@@ -147,12 +136,10 @@ npm run test:coverage
 ---
 
 ### **4️⃣ Movies By Genre**
-**🔹 Endpoint:** `GET /movies/genre/:genre?page=1`  
+**🔹 Endpoint:** `GET /movies?genre=drama&page=1`  
 **🔹 Description:** Fetches **movies filtered by genre**, paginated.  
-**🔹 Path Params:**  
-- `genre` – The movie genre (e.g., `Drama`).
-
 **🔹 Query Params:**  
+- `genre` – The movie genre (e.g., `Drama`).
 - `page` – Specify which page of results to retrieve.
 
 #### **Example Response:**
@@ -176,6 +163,16 @@ npm run test:coverage
 ## **🧑‍💻 Code Structure**
 ```
 📂 moviemeter
+├── 📂 .github
+│   ├── 📂 workflows       # GitHub Actions Workflows
+│   │   ├── deploy.yml     # Deployment Workflow
+│   │   ├── test.yml       # CI for Running Tests
+│   │   ├── lint.yml       # Code Linting
+├── 📂 config              # Environment Configurations
+│   ├── 📂 environments    # Separate Environment Files
+│   │   ├── .env.dev       # Development Config
+│   │   ├── .env.stage     # Staging Config
+│   │   ├── .env.prod      # Production Config
 ├── 📂 db                  # SQLite3 Databases
 ├── 📂 src
 │   ├── 📂 controllers     # API Controllers
@@ -183,26 +180,91 @@ npm run test:coverage
 │   ├── 📂 errors          # Custom Error Handling
 │   ├── 📂 middleware      # Middleware (Logging, Validation, etc.)
 │   ├── 📂 services        # Business Logic & Queries
-│   ├── 📂 tests           # Jest Unit Tests
 │   ├── 📂 utils           # Utility Functions (Logging, Validation)
-│   ├── server.ts          # Express Server Entry Point
-│   └── routes.ts          # API Routes
-├── .env                   # Environment Variables (Optional)
+│   ├── app.ts          # Express Server Entry Point
+├── 📂 tests               # Jest Unit Tests
 ├── package.json           # Dependencies & Scripts
 ├── tsconfig.json          # TypeScript Configuration
 └── README.md              # Project Documentation
+
 ```
 
 ---
 
 ## **🚀 Deployment**
-### **Run the API on a Cloud Service**
-Use **Docker** or deploy it to **Heroku, Vercel, or AWS**.
+This guide outlines a basic GitHub Actions workflow to deploy your application to a server whenever code is pushed to the main branch.
 
-To run with **Docker**:
-```sh
-docker build -t moviemeter .
-docker run -p 3000:3000 moviemeter
+📂 Project Structure
+css
+Copy code
+.github/
+ ├── workflows/
+ │    ├── deploy.yml
+ ├── src/
+ ├── package.json
+ ├── server.js
+ ├── ...
+1️⃣ Create a GitHub Actions Workflow
+Create a file in your repository:
+
+📌 Path: .github/workflows/deploy.yml
+
+2️⃣ Set Up GitHub Secrets
+Go to GitHub → Your Repository → Settings → Secrets and variables → Actions, and add:
+
+Secret Name	Description
+SERVER_HOST	Your server's IP address
+SERVER_USER	SSH username
+SSH_PRIVATE_KEY	Your private SSH key for authentication
+
+3️⃣ How It Works
+When you push code to the main branch, GitHub Actions:
+Checks out the latest code.
+Sets up Node.js and installs dependencies.
+Runs tests.
+SSHs into your server and pulls the latest changes.
+Restarts the app using PM2.
+✅ Conclusion
+This is a simple deployment setup.
+It automatically updates your server when changes are pushed to main.
+You can customize it for Docker, Kubernetes, or other services.
+🚀 You're now set up for automated deployments with GitHub Actions! 🚀
+```
+
+---
+
+📌 Choosing GraphQL vs REST for MovieMeter API
+🎯 Overview
+The current REST API implementation in MovieMeter provides structured endpoints that allow clients to request and filter data using query parameters. While this approach is effective, it may introduce inefficiencies in data retrieval and flexibility for clients.
+
+A GraphQL-based API could be a better alternative, especially considering the overlapping data needs across multiple endpoints. This write-up explores the benefits of GraphQL over REST in this context and the feasibility of transitioning to GraphQL.
+
+🔍 GraphQL Implementation Example
+🎯 GraphQL Schema for MovieMeter
+A GraphQL schema defines the structure of data clients can request.
+
+graphql
+Copy code
+type Movie {
+  id: ID!
+  title: String!
+  description: String
+  releaseDate: String
+  budget: String
+  runtime: Int
+  averageRating: String
+  genres: [String]
+  productionCompanies: [String]
+  originalLanguage: String
+}
+
+type Query {
+  movies(genre: String, year: Int): [Movie]
+  movie(id: ID!): Movie
+}
+
+➡ No Over-fetching!
+Clients only receive what they request.
 ```
 
 ---
